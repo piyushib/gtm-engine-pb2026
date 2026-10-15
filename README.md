@@ -2,6 +2,20 @@
 
 Traces every marketing dollar from **spend → channel → motion → cohort → retained gross profit**, and shows the unit economics at each hop. Same live model, two presentations: a dense **spreadsheet** for editing and comparison, and a **dashboard** for the narrative. On top of it sits a **heat sensor** layer that flags deteriorating unit economics *before* they cross a concerning level.
 
+**[Live demo →](https://piyushib.github.io/gtm-engine-pb2026/)**
+
+![Spreadsheet view under stress](screenshots/01-spreadsheet.png)
+
+The spreadsheet view after 115 simulated days with a shock running. Severity rails across the KPI strip mark which metrics are deteriorating; each shows a weekly trend and a sparkline. Every spend cell is editable and the whole model recomputes synchronously.
+
+![Alert centre](screenshots/02-alerts.png)
+
+The alert centre, showing per-channel alerts with the projected time to breach. Here four channels return less than $1.00 of gross profit on the next dollar — a finding the portfolio average completely hides.
+
+![Dashboard view](screenshots/03-dashboard.png)
+
+The same model as narrative: a Sankey tracing spend → channel → motion, cost-stack composition, share of spend against share of profit, and the optimizer's reallocation.
+
 ```bash
 npm install
 npm run dev     # http://localhost:3000
@@ -66,6 +80,12 @@ The seed is calibrated to a ~$32M ARR hybrid B2B SaaS at $1.1M/mo: 15.2-month bl
 `lib/model.ts` is pure functions over `lib/types.ts` — no React, no fetching. Replace `lib/seed.ts` with a warehouse query returning `Channel[]` and `Assumptions` and nothing else changes.
 
 What you need per channel: the four-part cost stack, motion mix, funnel conversion rates, retention per motion, and a saturation curve. The curve is the one thing you can't read directly off a dashboard — fit `K` and `h` to historical spend/customer pairs, ideally from periods where spend actually moved. Without real variance in spend, marginal CAC is guesswork and the optimizer is just restating your priors.
+
+## Deploying
+
+No server, no database, no API routes — the model is pure functions and the simulation runs in the browser, so it exports to static files. `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to `main`.
+
+The one gotcha: Pages serves from `/<repo>/`, so `next.config.js` sets `basePath` to match. **Rename the repository and you must change `repo` in that file**, or the deployed page loads with no CSS or JS.
 
 ## Layout
 
